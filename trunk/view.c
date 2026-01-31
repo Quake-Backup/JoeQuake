@@ -1010,7 +1010,7 @@ void V_CalcViewRoll (void)
 	}
 }
 
-void V_AddViewWeapon (float bob)
+void V_AddViewWeapon (entity_t *ent, float bob)
 {
 	int			i;
 	vec3_t		forward, right, up;
@@ -1047,6 +1047,14 @@ void V_AddViewWeapon (float bob)
 		else if (scr_viewsize.value == 80)
 			view->origin[2] += 0.5;
 	}
+
+	if (ent->lerpflags & LERP_FINISH)
+	{
+		view->lerpflags |= LERP_FINISH;
+		view->lerpfinish = ent->lerpfinish;
+	}
+	else
+		view->lerpflags &= ~LERP_FINISH;
 
 	view->model = cl.model_precache[cl.stats[STAT_WEAPON]];
 	view->frame = cl.stats[STAT_WEAPONFRAME];
@@ -1149,7 +1157,7 @@ void V_CalcRefdef (void)
 	if (cl.stats[STAT_HEALTH] <= 0)
 		r_refdef.viewangles[ROLL] = 80;	// dead view angle
 
-	V_AddViewWeapon (bob);
+	V_AddViewWeapon (ent, bob);
 
 	if (cl_thirdperson.value)
 		Chase_Update ();
